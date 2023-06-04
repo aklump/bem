@@ -1,0 +1,23 @@
+{
+  "name": "aklump/bem",
+  "description": "A PHP project to enforce the Block Element Modifier (CSS) model.",
+  "homepage": "https://github.com/aklump/bem",
+  "authors": [
+    {
+      "name": "Aaron Klump",
+      "homepage": "http://www.intheloftstudios.com",
+      "role": "Lead Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "AKlump\\Bem\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=7.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
+  }
+}
