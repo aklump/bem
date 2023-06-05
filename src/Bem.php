@@ -11,14 +11,9 @@ use AKlump\Bem\Styles\Official;
  * To change the global or the style, create a new class with appropriate
  * interfaces.
  */
-final class Bem implements BemInterface, BemGlobalInterface {
+final class Bem implements BemInterface {
 
   use BemTrait;
-
-  /**
-   * @var string
-   */
-  private $block;
 
   /**
    * BEM constructor.
@@ -27,25 +22,7 @@ final class Bem implements BemInterface, BemGlobalInterface {
    *   The base to use for the BEM block.
    */
   public function __construct(string $block) {
-    $this->block = $block;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBemBlock(): string {
-    return $this->block;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBemGlobalBlock(): string {
-    return 'bem';
-  }
-
-  public function getBemStyle(): StyleInterface {
-    return new Official();
+    $this->bemSetBlock($block);
   }
 
 }

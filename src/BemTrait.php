@@ -15,27 +15,61 @@ trait BemTrait {
   /**
    * @var string
    */
-  private $_bemBlock;
+  private $bemBlock;
 
-  /** @var \AKlump\Bem\BemInterface */
-  private $_bemGlobal;
+  protected static $bemGlobal = 'bem';
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function bemGlobalSetBlock(string $global_block = 'bem'): void {
+    self::$bemGlobal = $global_block;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function bemSetBlock(string $block): void {
+    $this->bemBlock = $this->bemStyle()
+      ->normalizeBlock($block);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function bemSetStyle(StyleInterface $style): void {
+    $this->bemStyle = $style;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function bemGlobal(): BemInterface {
+    return new self(self::$bemGlobal);
+  }
+
+  protected function bemStyle(): StyleInterface {
+    return $this->bemStyle ?? new \AKlump\Bem\Styles\Official();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function bemBlock(int $options = 0): string {
-    if (!isset($this->_bemBlock)) {
-      $this->_bemBlock = $this->getBemStyle()
-        ->normalizeBlock($this->getBemBlock());
+    if (!isset($this->bemBlock)) {
+      throw new \RuntimeException(sprintf('You must call %s->bemSetBlock() first', static::class));
     }
     $classes = [];
-    $classes[] = $this->_bemBlock;
+    $classes[] = $this->bemBlock;
     if ($options & BemInterface::NO_BASE) {
       $classes = [];
     }
     if ($options & BemInterface::JS) {
-      $classes[] = $this->getBemStyle()->javascript() . $this->_bemBlock;
+      $classes[] = $this->bemStyle()->javascript() . $this->bemBlock;
     }
     if ($options & BemInterface::GLOBAL) {
       $classes[] = $this->bemGlobal()
-        ->bemBlock($this->getGlobalOptions($options));
+        ->bemBlock($options & ~BemInterface::GLOBAL);
     }
 
     return implode(' ', $classes);
@@ -53,8 +87,8 @@ trait BemTrait {
    */
   public function bemElement(string $element, int $options = 0): string {
     $base = $this->bemBlock();
-    $base .= $this->getBemStyle()->element();
-    $base .= $this->getBemStyle()->normalizeElement($element);
+    $base .= $this->bemStyle()->element();
+    $base .= $this->bemStyle()->normalizeElementStub($element);
 
     $classes = [];
     $classes[] = $base;
@@ -62,11 +96,11 @@ trait BemTrait {
       $classes = [];
     }
     if ($options & BemInterface::JS) {
-      $classes[] = $this->getBemStyle()->javascript() . $base;
+      $classes[] = $this->bemStyle()->javascript() . $base;
     }
     if ($options & BemInterface::GLOBAL) {
       $classes[] = $this->bemGlobal()
-        ->bemElement($element, $this->getGlobalOptions($options));
+        ->bemElement($element, $options & ~BemInterface::GLOBAL);
     }
 
     return implode(' ', $classes);
@@ -84,19 +118,19 @@ trait BemTrait {
    */
   public function bemModifier(string $modifier, int $options = 0): string {
     $base = $this->bemBlock();
-    $base .= $this->getBemStyle()->modifier();
-    $base .= $this->getBemStyle()->normalizeModifer($modifier);
+    $base .= $this->bemStyle()->modifier();
+    $base .= $this->bemStyle()->normalizeModifierStub($modifier);
 
     $classes[] = $base;
     if ($options & BemInterface::NO_BASE) {
       $classes = [];
     }
     if ($options & BemInterface::JS) {
-      $classes[] = $this->getBemStyle()->javascript() . $base;
+      $classes[] = $this->bemStyle()->javascript() . $base;
     }
     if ($options & BemInterface::GLOBAL) {
       $classes[] = $this->bemGlobal()
-        ->bemModifier($modifier, $this->getGlobalOptions($options));
+        ->bemModifier($modifier, $options & ~BemInterface::GLOBAL);
     }
 
     return implode(' ', $classes);
@@ -121,54 +155,20 @@ trait BemTrait {
    *   The element and element/modifier, with optional javascript counterparts.
    */
   public function bemElementWithModifier(string $element, string $modifier, int $options = 0) {
-    $classes = explode(' ', $this->bemElement($element, $options));
-    foreach ($classes as $class) {
-      $classes[] = "$class--$modifier";
+    $element_options = $options & ~BemInterface::NO_BASE;
+    $classes = explode(' ', $this->bemElement($element, $element_options));
+    if ($options & BemInterface::NO_BASE) {
+      foreach ($classes as &$class) {
+        $class = "$class--$modifier";
+      }
     }
-
-    return implode(' ', $classes);
-  }
-
-  public function bemGlobal(): BemInterface {
-    if (!isset($this->_bemGlobal)) {
-      $this->_bemGlobal = new static($this->getBemStyle()
-        ->normalizeBlock($this->getBemGlobalBlock()));
-    }
-
-    return $this->_bemGlobal;
-  }
-
-  abstract public function getBemBlock(): string;
-
-  abstract public function getBemGlobalBlock(): string;
-
-  abstract public function getBemStyle(): StyleInterface;
-
-
-  /**
-   * @return array
-   *   An array of option combinations that are not allowed.
-   */
-  private function getInvalidOptionCombinations(): array {
-    return [
-      BemInterface::GLOBAL | BemInterface::NO_BASE,
-      BemInterface::GLOBAL | BemInterface::JS | BemInterface::NO_BASE,
-    ];
-  }
-
-  private function getGlobalOptions(int $options): int {
-    foreach ($this->getInvalidOptionCombinations() as $invalid_option_combination) {
-      if ($options === $invalid_option_combination) {
-        throw new \OutOfBoundsException("Invalid options combination.");
+    else {
+      foreach ($classes as $class) {
+        $classes[] = "$class--$modifier";
       }
     }
 
-    $global_options = 0;
-    if ($options & BemInterface::JS) {
-      $global_options = $global_options | BemInterface::JS;
-    }
-
-    return $global_options;
+    return implode(' ', $classes);
   }
 
 }

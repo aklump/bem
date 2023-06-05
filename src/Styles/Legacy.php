@@ -19,7 +19,7 @@ final class Legacy implements StyleInterface {
     return 'js-';
   }
 
-  public function normalizeElement(string $element): string {
+  public function normalizeElementStub(string $element): string {
     $element = str_replace([' ', '.'], ['-', '-'], $element);
     $element = preg_replace('/_{2,}/', '_', $element);
     $element = preg_replace('/-{2,}/', '-', $element);
@@ -27,7 +27,7 @@ final class Legacy implements StyleInterface {
     return $element;
   }
 
-  public function normalizeModifer(string $modifier): string {
+  public function normalizeModifierStub(string $modifier): string {
     $string = $modifier;
     $string = str_replace([' ', '.'], ['-', '-'], $string);
     $string = preg_replace('/_{2,}/', '_', $string);

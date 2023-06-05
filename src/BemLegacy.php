@@ -2,8 +2,7 @@
 
 namespace AKlump\Bem;
 
-use AKlump\Bem\styles\StyleInterface;
-use AKlump\Bem\Styles\Official;
+use AKlump\Bem\Styles\Legacy;
 
 /**
  * Provides BEM methods using legacy interface and styles.
@@ -18,43 +17,21 @@ final class BemLegacy {
   }
 
   /**
-   * @var string
-   */
-  private $block;
-
-  /**
    * BEM constructor.
    *
    * @param string $block
    *   The base to use for the BEM block.
    */
   public function __construct(string $block) {
-    $this->block = $block;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBemBlock(): string {
-    return $this->block;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBemGlobalBlock(): string {
-    return 'bem';
-  }
-
-  public function getBemStyle(): StyleInterface {
-    return new \AKlump\Bem\Styles\Legacy();
+    $this->bemSetBlock($block);
+    $this->bemSetStyle(new Legacy());
   }
 
   public function bemModifier(string $modifier, $include_js = FALSE, $clean = TRUE): string {
     $output = $this->bemBlock();
-    $output .= $this->getBemStyle()->modifier();
+    $output .= $this->bemStyle()->modifier();
     if ($clean) {
-      $output .= $this->getBemStyle()->normalizeModifer($modifier);
+      $output .= $this->bemStyle()->normalizeModifierStub($modifier);
     }
     else {
       $output .= $modifier;
@@ -68,9 +45,9 @@ final class BemLegacy {
 
   public function bemElement(string $element, bool $include_js = FALSE, $clean = TRUE): string {
     $output = $this->bemBlock();
-    $output .= $this->getBemStyle()->element();
+    $output .= $this->bemStyle()->element();
     if ($clean) {
-      $output .= $this->getBemStyle()->normalizeElement($element);
+      $output .= $this->bemStyle()->normalizeElementStub($element);
     }
     else {
       $output .= $element;
@@ -94,7 +71,7 @@ final class BemLegacy {
    * @link https://en.bem.info/methodology/naming-convention/
    */
   public function cleanBem(string $string): string {
-    return $this->getBemStyle()->normalizeElement($string);
+    return $this->bemStyle()->normalizeElementStub($string);
   }
 
   /**
@@ -120,7 +97,7 @@ final class BemLegacy {
    *   The 'js-' block string.
    */
   public function bemJsBlock(): string {
-    $class = $this->getBemStyle()->javascript();
+    $class = $this->bemStyle()->javascript();
     $class .= $this->bemBlock();
 
     return $class;
@@ -136,7 +113,7 @@ final class BemLegacy {
    *   The BE(lement)M based on component name.
    */
   public function bemJsElement(string $element): string {
-    $class = $this->getBemStyle()->javascript();
+    $class = $this->bemStyle()->javascript();
     $class .= $this->bemElement($element, FALSE);
 
     return $class;
@@ -152,7 +129,7 @@ final class BemLegacy {
    *   The BEM(odifier) based on component name.
    */
   public function bemJsModifier(string $modifier): string {
-    $class = $this->getBemStyle()->javascript();
+    $class = $this->bemStyle()->javascript();
     $class .= $this->bemModifier($modifier, FALSE);
 
     return $class;
@@ -178,12 +155,7 @@ final class BemLegacy {
    * BemInterface::JS) instead.
    */
   public function bemElementWithGlobal(string $element, int $options = 0): string {
-    if ($this instanceof BemGlobalInterface) {
-      $global = new Bem($this->bemGlobal());
-    }
-    else {
-      $global = new Bem('bem');
-    }
+    $global = new Bem('bem');
 
     return implode(' ', [
       $this->bemElement($element, $options),

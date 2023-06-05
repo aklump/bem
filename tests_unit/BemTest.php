@@ -11,6 +11,19 @@ use PHPUnit\Framework\TestCase;
  */
 final class BemTest extends TestCase {
 
+  public function testSetGlobalBlockAffectsAllInstances() {
+    $bem1 = new Bem('peanut');
+    $this->assertSameClassStringAnyOrder('peanut bem', $bem1->bemBlock(BemInterface::GLOBAL));
+
+    Bem::bemGlobalSetBlock('butter');
+    $bem2 = new Bem('peanut');
+    $this->assertSameClassStringAnyOrder('peanut butter', $bem1->bemBlock(BemInterface::GLOBAL));
+    $this->assertSameClassStringAnyOrder('peanut butter', $bem2->bemBlock(BemInterface::GLOBAL));
+
+    // Reset back to the default for other tests.
+    Bem::bemGlobalSetBlock();
+  }
+
   public function testElementWithModifierAndGlobalAndJsOptions() {
     $bem = new Bem('cookie');
     $result = $bem->bemElementWithModifier('dough', 'uncooked', BemInterface::GLOBAL | BemInterface::JS);
@@ -27,6 +40,12 @@ final class BemTest extends TestCase {
     $bem = new Bem('cookie');
     $result = $bem->bemElementWithModifier('dough', 'uncooked', BemInterface::JS);
     $this->assertSameClassStringAnyOrder('cookie__dough js-cookie__dough cookie__dough--uncooked js-cookie__dough--uncooked', $result);
+  }
+
+  public function testElementWithModifierNoBase() {
+    $bem = new Bem('cookie');
+    $result = $bem->bemElementWithModifier('dough', 'uncooked', BemInterface::NO_BASE);
+    $this->assertSameClassStringAnyOrder('cookie__dough--uncooked', $result);
   }
 
   public function testElementWithModifierNoOptions() {
@@ -55,18 +74,6 @@ final class BemTest extends TestCase {
     $this->assertSameClassStringAnyOrder('tree__trunk js-tree__trunk', $bem->bemElement('trunk', BemInterface::JS));
     $this->assertSameClassStringAnyOrder('tree__trunk bem__trunk', $bem->bemElement('trunk', BemInterface::GLOBAL));
     $this->assertSameClassStringAnyOrder('tree__trunk js-tree__trunk bem__trunk js-bem__trunk', $bem->bemElement('trunk', BemInterface::GLOBAL | BemInterface::JS));
-  }
-
-  public function testOptionsGlobalAndJSAndNoBaseThrows() {
-    $this->expectException(\OutOfBoundsException::class);
-    $bem = new Bem('tree');
-    $bem->bemBlock(BemInterface::GLOBAL | BemInterface::JS | BemInterface::NO_BASE);
-  }
-
-  public function testOptionsGlobalAndNoBaseThrows() {
-    $this->expectException(\OutOfBoundsException::class);
-    $bem = new Bem('tree');
-    $bem->bemBlock(BemInterface::GLOBAL | BemInterface::NO_BASE);
   }
 
   public function testBemBlock() {

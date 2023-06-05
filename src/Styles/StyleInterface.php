@@ -15,7 +15,7 @@ interface StyleInterface {
    * @return string
    *   The normalized element portion of the block+element class.
    */
-  public function normalizeElement(string $element): string;
+  public function normalizeElementStub(string $element): string;
 
   public function normalizeBlock(string $block): string;
 
@@ -30,7 +30,7 @@ interface StyleInterface {
    * @return string
    *   The normalized element portion of the block+modifier class.
    */
-  public function normalizeModifer(string $modifier): string;
+  public function normalizeModifierStub(string $modifier): string;
 
   /**
    * @return string

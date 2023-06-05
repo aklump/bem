@@ -16,21 +16,58 @@ final class Official implements StyleInterface {
     return 'js-';
   }
 
-  public function normalizeBlock(string $block): string {
-    $block = strtolower($block);
-
-    return $block;
+  /**
+   * Block
+   *
+   * @param string $block
+   *
+   * @return string
+   */
+  public function normalizeBlock(string $value): string {
+    return $this->normalize($value);
   }
 
-  public function normalizeElement(string $element): string {
-    $element = strtolower($element);
-
-    return $element;
+  /**
+   * Element names may consist of Latin letters, digits, dashes.
+   *
+   * @param string $element
+   *
+   * @return string
+   */
+  public function normalizeElementStub(string $value): string {
+    return $this->normalize($value);
   }
 
-  public function normalizeModifer(string $modifier): string {
-    $modifier = strtolower($modifier);
-
-    return $modifier;
+  /**
+   * Modifier names may consist of Latin letters, digits, dashes.
+   *
+   * @param string $modifier
+   *
+   * @return string
+   */
+  public function normalizeModifierStub(string $value): string {
+    return $this->normalize($value);
   }
+
+  /**
+   * Normalize a CSS class BEM part before it's combined.
+   *
+   * @param string $name_part
+   *
+   * @return string
+   *
+   * @link https://getbem.com/naming/
+   */
+  private function normalize(string $name_part) {
+    $name_part = strtolower($name_part);
+
+    // May consist of Latin letters, digits, and single dashes.
+    $name_part = preg_replace('/[^a-z0-9-]/', '-', $name_part);
+
+    // They may not contain multiple, consecutive dashes/underscores.
+    $name_part = preg_replace('/[-]{2,}/', '-', $name_part);
+
+    return $name_part;
+  }
+
 }

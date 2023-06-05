@@ -3,6 +3,8 @@
 namespace AKlump\Bem;
 
 
+use AKlump\Bem\Styles\StyleInterface;
+
 /**
  * Provides BEM style classnames.
  *
@@ -27,10 +29,37 @@ interface BemInterface {
   const NO_BASE = 4;
 
   /**
+   * Set the global block for all instances.
+   *
+   * Be careful with this, because it will affect ALL instances, those already
+   * created AND those yet to be created.  It's meant to be called once by your
+   * bootstrap and then left alone.
+   *
+   * @param string $global_block
+   *   The value to use for the global block.
+   *
+   * @code
+   * Bem::bemGlobalSetBlock('component');
+   * $bem = new Bem(...
+   * $bem2 = new Bem(...
+   * $bem3 = new Bem(...
+   * @endcode
+   */
+  public static function bemGlobalSetBlock(string $global_block): void;
+
+  public static function bemGlobal(): BemInterface;
+
+  public function bemSetBlock(string $block): void;
+
+  public function bemSetStyle(StyleInterface $style): void;
+
+  /**
    * Standalone entity that is meaningful on its own.
    *
    * @return string
    *   Return the block value.
+   *
+   * @throws \RuntimeException If the block has not been set correctly or is invalid.
    */
   public function bemBlock(int $options = 0): string;
 
