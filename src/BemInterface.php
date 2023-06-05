@@ -32,7 +32,7 @@ interface BemInterface {
    * @return string
    *   Return the block value.
    */
-  public function bemBlock(): string;
+  public function bemBlock(int $options = 0): string;
 
   /**
    * Return the BEM element.
@@ -84,33 +84,4 @@ interface BemInterface {
    */
   public function bemElementWithModifier(string $element, string $modifier, int $options = 0);
 
-  /**
-   * Return only the BEM block string prefixed for Javascript operations.
-   *
-   * @return string
-   *   The 'js-' block string.
-   */
-  //  public function bemJsBlock(): string;
-
-  /**
-   * Return only the BEM element prefixed for Javascript operations.
-   *
-   * @param string $element
-   *   The element, less the block portion.
-   *
-   * @return string
-   *   The BE(lement)M based on component name.
-   */
-  //  public function bemJsElement(string $element): string;
-
-  /**
-   * Return only the BEM modifier prefixed for Javascript operations.
-   *
-   * @param string $modifier
-   *   The modifier, less the block portion.
-   *
-   * @return string
-   *   The BEM(odifier) based on component name.
-   */
-  //  public function bemJsModifier(string $modifier): string;
 }
