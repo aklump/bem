@@ -12,6 +12,7 @@ $bem = new \AKlump\Bem\Bem('foo');
 $bem->bemBlock(); // "foo"
 $bem->bemElement('content'); // "foo__content"
 $bem->bemModifier('has-image'); // "foo--has-image"
+$bem->bemElementWithModifier('content', 'has-image'); // "foo__content foo__content--has-image"
 ```
 
 ### w/Javascript Classes
@@ -20,6 +21,7 @@ $bem->bemModifier('has-image'); // "foo--has-image"
 $bem->bemBlock(BemInterface::JS); // "foo js-foo"
 $bem->bemElement('content', BemInterface::JS); // "foo__content js-foo__content"
 $bem->bemModifier('has-image', BemInterface::JS); // "foo--has-image js-foo--has-image"
+$bem->bemElementWithModifier('content', 'has-image', BemInterface::JS); // "foo__content js-foo__content foo__content--has-image js-foo__content--has-image"
 ```
 
 ## Usage as a Class Trait
