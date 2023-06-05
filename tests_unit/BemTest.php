@@ -1,117 +1,98 @@
 <?php
 
-
 namespace AKlump\Bem\Tests;
 
-use PHPUnit\Framework\TestCase;
 use AKlump\Bem\Bem;
+use AKlump\Bem\BemInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @group extensions
- * @group front_end_components
- * @covers \Drupal\front_end_components\Bem
+ * @covers \AKlump\Bem\Bem
  */
 final class BemTest extends TestCase {
 
-  /**
-   * Provides data for testTwoDashStyle.
-   */
-  public function dataForTestTwoDashStyleProvider() {
-    $tests = [];
-    $tests[] = ['lower', 'LoWEr'];
-    $tests[] = ['foo-bar', 'foo_bar'];
-    $tests[] = ['foo-bar', 'foo bar'];
-    $tests[] = ['foo-bar', 'foo.bar'];
-    $tests[] = ['foo-bar', 'foo-bar'];
-    $tests[] = ['foo-bar', 'foo/bar'];
-    $tests[] = ['foo-bar', 'foo__bar'];
-    $tests[] = ['foo-bar', 'foo--bar'];
-
-    return $tests;
+  public function testElementWithModifierAndGlobalAndJsOptions() {
+    $bem = new Bem('cookie');
+    $result = $bem->bemElementWithModifier('dough', 'uncooked', BemInterface::GLOBAL | BemInterface::JS);
+    $this->assertSameClassStringAnyOrder('cookie__dough bem__dough js-cookie__dough js-bem__dough cookie__dough--uncooked bem__dough--uncooked js-cookie__dough--uncooked js-bem__dough--uncooked', $result);
   }
 
-  /**
-   * @dataProvider dataForTestTwoDashStyleProvider
-   */
-  public function testTwoDashStyle(string $control, string $subject) {
-    $bem = new Bem('chien');
-    $this->assertSame($control, $bem->twoDashStyle($subject));
+  public function testElementWithModifierWithGlobalOption() {
+    $bem = new Bem('cookie');
+    $result = $bem->bemElementWithModifier('dough', 'uncooked', BemInterface::GLOBAL);
+    $this->assertSameClassStringAnyOrder('cookie__dough bem__dough cookie__dough--uncooked bem__dough--uncooked', $result);
   }
 
-  public function testBemElementWithGlobal() {
-    $bem = new Bem('chat');
-
-    $result = explode(' ', $bem->bemElementWithGlobal('noir'));
-    $this->assertContains('chat__noir', $result);
-    $this->assertContains(Bem::GLOBAL . '__noir', $result);
-
-    // JS option.
-    $result = explode(' ', $bem->bemElementWithGlobal('noir', FALSE));
-    $this->assertContains('chat__noir', $result);
-    $this->assertContains(Bem::GLOBAL . '__noir', $result);
-
-    $result = explode(' ', $bem->bemElementWithGlobal('noir', TRUE));
-    $this->assertContains('js-chat__noir', $result);
-    $this->assertContains('js-' . Bem::GLOBAL . '__noir', $result);
-    $this->assertContains('chat__noir', $result);
-    $this->assertContains(Bem::GLOBAL . '__noir', $result);
+  public function testElementWithModifierWithJsOption() {
+    $bem = new Bem('cookie');
+    $result = $bem->bemElementWithModifier('dough', 'uncooked', BemInterface::JS);
+    $this->assertSameClassStringAnyOrder('cookie__dough js-cookie__dough cookie__dough--uncooked js-cookie__dough--uncooked', $result);
   }
 
-  public function testBemElementWithModifier() {
-    $bem = new Bem('vache');
-    $this->assertSame('vache__noir vache__noir--grand', $bem->bemElementWithModifier('noir', 'grand'));
-    $this->assertSame('vache__noir vache__noir--grand', $bem->bemElementWithModifier('noir', 'grand'), FALSE);
-    $this->assertSame('vache__noir vache__noir--grand js-vache__noir js-vache__noir--grand', $bem->bemElementWithModifier('noir', 'grand', TRUE));
+  public function testElementWithModifierNoOptions() {
+    $bem = new Bem('cookie');
+    $result = $bem->bemElementWithModifier('dough', 'uncooked');
+    $this->assertSameClassStringAnyOrder('cookie__dough cookie__dough--uncooked', $result);
+  }
+
+  public function testBemGlobal() {
+    $bem = new Bem('flower');
+    $this->assertInstanceOf(BemInterface::class, $bem->bemGlobal());
+    $this->assertSameClassStringAnyOrder('bem', $bem->bemGlobal()->bemBlock());
   }
 
   public function testBemModifier() {
-    $bem = new Bem('bravo');
-    $this->assertSame('bravo--lorem', $bem->bemModifier('lorem'));
-
-    // JS option.
-    $this->assertSame('bravo--lorem', $bem->bemModifier('lorem', FALSE));
-    $this->assertSame('bravo--lorem js-bravo--lorem', $bem->bemModifier('lorem', TRUE));
-
-    // Clean option.
-    $this->assertSame('bravo--lorem--ipsum__dolar', $bem->bemModifier('lorem--ipsum__dolar', FALSE, FALSE));
-    $string = 'lorem--ipsum__dolar';
-    $clean = $bem->cleanBem($string);
-    $this->assertSame("bravo--$clean", $bem->bemModifier($string, FALSE, TRUE));
-  }
-
-  public function testBemJsElement() {
-    $bem = new Bem('alpha');
-    $this->assertSame('js-alpha__bar', $bem->bemJsElement('bar'));
+    $bem = new Bem('sandwich');
+    $this->assertSameClassStringAnyOrder('sandwich--meet', $bem->bemModifier('meet'));
+    $this->assertSameClassStringAnyOrder('sandwich--meet js-sandwich--meet', $bem->bemModifier('meet', BemInterface::JS));
+    $this->assertSameClassStringAnyOrder('sandwich--meet bem--meet', $bem->bemModifier('meet', BemInterface::GLOBAL));
+    $this->assertSameClassStringAnyOrder('sandwich--meet js-sandwich--meet bem--meet js-bem--meet', $bem->bemModifier('meet', BemInterface::GLOBAL | BemInterface::JS));
   }
 
   public function testBemElement() {
-    $bem = new Bem('foo');
-    $this->assertSame('foo__bar', $bem->bemElement('bar'));
-
-    // JS option.
-    $this->assertSame('foo__bar', $bem->bemElement('bar', FALSE));
-    $this->assertSame('foo__bar js-foo__bar', $bem->bemElement('bar', TRUE));
-
-    // Clean option.
-    $this->assertSame('foo__bar--baz__beef', $bem->bemElement('bar--baz__beef', FALSE, FALSE));
-    $string = 'bar--baz__beef';
-    $clean = $bem->cleanBem($string);
-    $this->assertSame("foo__$clean", $bem->bemElement($string, FALSE, TRUE));
+    $bem = new Bem('tree');
+    $this->assertSameClassStringAnyOrder('tree__trunk', $bem->bemElement('trunk'));
+    $this->assertSameClassStringAnyOrder('tree__trunk js-tree__trunk', $bem->bemElement('trunk', BemInterface::JS));
+    $this->assertSameClassStringAnyOrder('tree__trunk bem__trunk', $bem->bemElement('trunk', BemInterface::GLOBAL));
+    $this->assertSameClassStringAnyOrder('tree__trunk js-tree__trunk bem__trunk js-bem__trunk', $bem->bemElement('trunk', BemInterface::GLOBAL | BemInterface::JS));
   }
 
-  public function testBemJsBlock() {
-    $bem = new Bem('foo');
-    $this->assertSame('js-foo', $bem->bemJsBlock());
+  public function testOptionsGlobalAndJSAndNoBaseThrows() {
+    $this->expectException(\OutOfBoundsException::class);
+    $bem = new Bem('tree');
+    $bem->bemBlock(BemInterface::GLOBAL | BemInterface::JS | BemInterface::NO_BASE);
+  }
+
+  public function testOptionsGlobalAndNoBaseThrows() {
+    $this->expectException(\OutOfBoundsException::class);
+    $bem = new Bem('tree');
+    $bem->bemBlock(BemInterface::GLOBAL | BemInterface::NO_BASE);
   }
 
   public function testBemBlock() {
-    $bem = new Bem('foo');
-    $this->assertSame('foo', $bem->bemBlock());
+    $bem = new Bem('fish');
+    $this->assertSameClassStringAnyOrder('fish', $bem->bemBlock());
+
+    $bem = new Bem('fish');
+
+    $this->assertSameClassStringAnyOrder('fish', $bem->bemBlock());
+    $this->assertSameClassStringAnyOrder('fish js-fish', $bem->bemBlock(BemInterface::JS));
+
+    // Javascript only class
+    $this->assertSameClassStringAnyOrder('js-fish', $bem->bemBlock(BemInterface::JS | BemInterface::NO_BASE));
+
+    // Add the global instance.
+    $this->assertSameClassStringAnyOrder('fish bem', $bem->bemBlock(BemInterface::GLOBAL));
+    $this->assertSameClassStringAnyOrder('fish js-fish bem js-bem', $bem->bemBlock(BemInterface::GLOBAL | BemInterface::JS));
   }
 
-  public function testCleanBem() {
-    $bem = new Bem('poulet');
-    $this->assertSame('_foo-bar-is_lorem', $bem->cleanBem('__foo--bar-is_lorem'));
-    $this->assertSame('_foo-bar-is_lorem', $bem->cleanBem('__foo bar.is_lorem'));
+  private function assertSameClassStringAnyOrder(string $expected_classes, $result) {
+    $expected_classes = explode(' ', $expected_classes);
+    $actual_classes = explode(' ', $result);
+    $this->assertCount(count($expected_classes), $actual_classes);
+    foreach ($expected_classes as $expected_class) {
+      $this->assertContains($expected_class, $actual_classes);
+    }
   }
+
 }

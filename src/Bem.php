@@ -2,12 +2,16 @@
 
 namespace AKlump\Bem;
 
-/**
- * Provides BEM style classnames.
- */
-final class Bem implements BemInterface {
+use AKlump\Bem\styles\StyleInterface;
+use AKlump\Bem\Styles\Official;
 
-  const GLOBAL = 'component';
+/**
+ * Provides BEM methods using the official style.
+ *
+ * To change the global or the style, create a new class with appropriate
+ * interfaces.
+ */
+final class Bem implements BemInterface, BemGlobalInterface {
 
   use BemTrait;
 
@@ -29,20 +33,19 @@ final class Bem implements BemInterface {
   /**
    * {@inheritdoc}
    */
-  public function bemBlock(): string {
+  public function getBemBlock(): string {
     return $this->block;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function bemElementWithGlobal(string $element, bool $include_js = FALSE, bool $clean = TRUE): string {
-    $global = new self(Bem::GLOBAL);
+  public function getBemGlobalBlock(): string {
+    return 'bem';
+  }
 
-    return implode(' ', [
-      $this->bemElement($element, $include_js, $clean),
-      $global->bemElement($element, $include_js, $clean),
-    ]);
+  public function getBemStyle(): StyleInterface {
+    return new Official();
   }
 
 }

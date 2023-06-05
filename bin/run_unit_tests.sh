@@ -11,7 +11,7 @@ while [ -h "$source" ]; do # resolve $source until the file is no longer a symli
   [[ $source != /* ]] && source="$dir/$source" # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
 root="$( cd -P "$( dirname "$source" )" && pwd )"
-app_root="$( cd ../)"
+app_root="$( cd "$root/../" && pwd )"
 
 # https://phpunit.readthedocs.io/en/9.5/textui.html#command-line-options
-cd "$app_root" && ./vendor/bin/phpunit -c tests_unit/phpunit.xml $@
+cd "$app_root" && ./vendor/bin/phpunit -c ./tests_unit/phpunit.xml $@

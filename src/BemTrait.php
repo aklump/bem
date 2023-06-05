@@ -2,56 +2,74 @@
 
 namespace AKlump\Bem;
 
+use AKlump\Bem\Styles\StyleInterface;
+
 /**
- * Trait BemTrait handles block/element/modifier CSS.
+ * Shared fulfillment of the Bem Interfaces.
  *
- * To use this trait your class must implement the method ::bemBlock, which
- * returns the base value for BEM concantenation.  Here is an example
- * implementation:
- *
- * @code
- *   public function bemBlock(): string {
- *     return 'user-collections';
- *   }
- * @endcode
+ * To use this trait your class must implement the abstract methods.  Refer to
+ * \AKlump\Bem\Bem as a usage example.
  */
 trait BemTrait {
 
   /**
-   * Return the BEM block string.
-   *
-   * @return string
-   *   The block string.
+   * @var string
    */
-  abstract public function bemBlock(): string;
+  private $_bemBlock;
+
+  /** @var \AKlump\Bem\BemInterface */
+  private $_bemGlobal;
+
+  public function bemBlock(int $options = 0): string {
+    if (!isset($this->_bemBlock)) {
+      $this->_bemBlock = $this->getBemStyle()
+        ->normalizeBlock($this->getBemBlock());
+    }
+    $classes = [];
+    $classes[] = $this->_bemBlock;
+    if ($options & BemInterface::NO_BASE) {
+      $classes = [];
+    }
+    if ($options & BemInterface::JS) {
+      $classes[] = $this->getBemStyle()->javascript() . $this->_bemBlock;
+    }
+    if ($options & BemInterface::GLOBAL) {
+      $classes[] = $this->bemGlobal()
+        ->bemBlock($this->getGlobalOptions($options));
+    }
+
+    return implode(' ', $classes);
+  }
 
   /**
    * Return the BEM element.
    *
    * @param string $element
    *   The element, less the block portion.
-   * @param bool $include_js
-   *   Set this to true to also include a "js-" prefixed element class to be
-   *   used explicitly by Javascript operations.
-   * @param bool $clean
-   *   When TRUE, $element will be processed to remove double hyphens and double
-   *   underscores to follow a BEM naming convention.  In some cases you will
-   *   not want this so set this to FALSE to avoid manipulation of the passed
-   *   value.
+   * @param bool $options
    *
    * @return string
    *   The BE(lement)M based on component name.
    */
-  public function bemElement(string $element, bool $include_js = FALSE, bool $clean = TRUE): string {
-    if ($clean) {
-      $element = $this->cleanBem($element);
+  public function bemElement(string $element, int $options = 0): string {
+    $base = $this->bemBlock();
+    $base .= $this->getBemStyle()->element();
+    $base .= $this->getBemStyle()->normalizeElement($element);
+
+    $classes = [];
+    $classes[] = $base;
+    if ($options & BemInterface::NO_BASE) {
+      $classes = [];
     }
-    $output = $this->bemBlock() . '__' . $element;
-    if (!$include_js) {
-      return $output;
+    if ($options & BemInterface::JS) {
+      $classes[] = $this->getBemStyle()->javascript() . $base;
+    }
+    if ($options & BemInterface::GLOBAL) {
+      $classes[] = $this->bemGlobal()
+        ->bemElement($element, $this->getGlobalOptions($options));
     }
 
-    return $output . ' ' . $this->bemJsElement($element, $clean);
+    return implode(' ', $classes);
   }
 
   /**
@@ -59,54 +77,29 @@ trait BemTrait {
    *
    * @param string $modifier
    *   The modifier, less the block portion.
-   * @param bool $include_js
-   *   Set this to true to also include a "js-" prefixed modifier class to be
-   *   used explicitly by Javascript operations.
-   * @param bool $clean
-   *   When TRUE, $element will be processed to remove double hyphens and double
-   *   underscores to follow a BEM naming convention.  In some cases you will
-   *   not want this so set this to FALSE to avoid manipulation of the passed
-   *   value.
+   * @param int $options
    *
    * @return string
    *   The BEM(odifier) based on component name.
    */
-  public function bemModifier(string $modifier, $include_js = FALSE, bool $clean = TRUE): string {
-    if ($clean) {
-      $modifier = $this->cleanBem($modifier);
-    }
-    $output = $this->bemBlock() . '--' . $modifier;
-    if (!$include_js) {
-      return $output;
-    }
+  public function bemModifier(string $modifier, int $options = 0): string {
+    $base = $this->bemBlock();
+    $base .= $this->getBemStyle()->modifier();
+    $base .= $this->getBemStyle()->normalizeModifer($modifier);
 
-    return $output . ' ' . $this->bemJsModifier($modifier, $clean);
-  }
-
-  /**
-   * In addition to a bem element, adds a global class, e.g. "el__width".
-   *
-   * The global class allows for targeting an element regardless of the specific
-   * bem block name, but by virture of the element part of the class, such as
-   * for all components at once.  For example if you want to set the width on
-   * any child component,  you could write your CSS like so: .parent>.el__width,
-   * rather than .parent>.foo__width, where "foo" is the bem block.
-   *
-   * @param string $element
-   * @param bool $include_js
-   * @param bool $clean
-   *
-   * @return string
-   */
-  public function bemElementWithGlobal(string $element, bool $include_js = FALSE, bool $clean = TRUE): string {
-    if (empty($this->bemGlobal)) {
-      $this->bemGlobal = new \Drupal\front_end_components\Bem(\Drupal\front_end_components\Bem::GLOBAL);
+    $classes[] = $base;
+    if ($options & BemInterface::NO_BASE) {
+      $classes = [];
+    }
+    if ($options & BemInterface::JS) {
+      $classes[] = $this->getBemStyle()->javascript() . $base;
+    }
+    if ($options & BemInterface::GLOBAL) {
+      $classes[] = $this->bemGlobal()
+        ->bemModifier($modifier, $this->getGlobalOptions($options));
     }
 
-    return implode(' ', [
-      $this->bemElement($element, $include_js, $clean),
-      $this->bemGlobal->bemElement($element, $include_js, $clean),
-    ]);
+    return implode(' ', $classes);
   }
 
   /**
@@ -122,112 +115,60 @@ trait BemTrait {
    *   The element, less the block portion.
    * @param string $modifier
    *   The modifier to be appended to the generated element; see @code example.
-   * @param bool $include_js
-   *   Set this to true to also include the "js-" prefixed classes for a total
-   *   of four classes.
+   * @param int $options
    *
    * @return string
    *   The element and element/modifier, with optional javascript counterparts.
    */
-  public function bemElementWithModifier(string $element, string $modifier, bool $include_js = FALSE) {
-    $bem_element = $this->bemElement($element);
-    $output = [$bem_element, "$bem_element--$modifier"];
-    if ($include_js) {
-      $js_bem_element = $this->bemJsElement($element);
-      $output[] = $js_bem_element;
-      $output[] = "$js_bem_element--$modifier";
+  public function bemElementWithModifier(string $element, string $modifier, int $options = 0) {
+    $classes = explode(' ', $this->bemElement($element, $options));
+    foreach ($classes as $class) {
+      $classes[] = "$class--$modifier";
     }
 
-    return implode(' ', $output);
+    return implode(' ', $classes);
   }
 
-  /**
-   * Return only the BEM block string prefixed for Javascript operations.
-   *
-   * @return string
-   *   The 'js-' block string.
-   */
-  public function bemJsBlock(): string {
-    return 'js-' . $this->bemBlock();
-  }
-
-  /**
-   * Return only the BEM element prefixed for Javascript operations.
-   *
-   * @param string $element
-   *   The element, less the block portion.
-   * @param bool $clean
-   *   When TRUE, $element will be processed to remove double hyphens and double
-   *   underscores to follow a BEM naming convention.  In some cases you will
-   *   not want this so set this to FALSE to avoid manipulation of the passed
-   *   value.
-   *
-   * @return string
-   *   The BE(lement)M based on component name.
-   */
-  public function bemJsElement(string $element, bool $clean = TRUE): string {
-    if ($clean) {
-      $element = $this->cleanBem($element);
+  public function bemGlobal(): BemInterface {
+    if (!isset($this->_bemGlobal)) {
+      $this->_bemGlobal = new static($this->getBemStyle()
+        ->normalizeBlock($this->getBemGlobalBlock()));
     }
 
-    return 'js-' . $this->bemBlock() . '__' . $element;
+    return $this->_bemGlobal;
   }
 
+  abstract public function getBemBlock(): string;
+
+  abstract public function getBemGlobalBlock(): string;
+
+  abstract public function getBemStyle(): StyleInterface;
+
+
   /**
-   * Return only the BEM modifier prefixed for Javascript operations.
-   *
-   * @param string $modifier
-   *   The modifier, less the block portion.
-   * @param bool $clean
-   *   When TRUE, $element will be processed to remove double hyphens and double
-   *   underscores to follow a BEM naming convention.  In some cases you will
-   *   not want this so set this to FALSE to avoid manipulation of the passed
-   *   value.
-   *
-   * @return string
-   *   The BEM(odifier) based on component name.
+   * @return array
+   *   An array of option combinations that are not allowed.
    */
-  public function bemJsModifier(string $modifier, bool $clean = TRUE): string {
-    if ($clean) {
-      $modifier = $this->cleanBem($modifier);
+  private function getInvalidOptionCombinations(): array {
+    return [
+      BemInterface::GLOBAL | BemInterface::NO_BASE,
+      BemInterface::GLOBAL | BemInterface::JS | BemInterface::NO_BASE,
+    ];
+  }
+
+  private function getGlobalOptions(int $options): int {
+    foreach ($this->getInvalidOptionCombinations() as $invalid_option_combination) {
+      if ($options === $invalid_option_combination) {
+        throw new \OutOfBoundsException("Invalid options combination.");
+      }
     }
 
-    return 'js-' . $this->bemBlock() . '--' . $modifier;
-  }
+    $global_options = 0;
+    if ($options & BemInterface::JS) {
+      $global_options = $global_options | BemInterface::JS;
+    }
 
-  /**
-   * Remove double underscores and hyphens to facilitate proper BEM parts.
-   *
-   * @param string $string
-   *   A string to clean for use with BEM part.
-   *
-   * @return string
-   *   The cleaned bem part string.
-   *
-   * @link https://en.bem.info/methodology/naming-convention/
-   */
-  public function cleanBem(string $string): string {
-    $string = str_replace([' ', '.'], ['-', '-'], $string);
-    $string = preg_replace('/_{2,}/', '_', $string);
-    $string = preg_replace('/-{2,}/', '-', $string);
-
-    return $string;
-  }
-
-  /**
-   * @param string $string
-   *
-   * @return string
-   * @url https://en.bem.info/methodology/naming-convention/#two-dashes-style
-   *
-   * // TODO Figure out how to implement this instead of clean.
-   */
-  public function twoDashStyle(string $string): string {
-    $string = strtolower($string);
-    $string = preg_replace('/[\W_]/', '-', $string);
-    $string = preg_replace('/[-_]{2,}/', '-', $string);
-
-    return $string;
+    return $global_options;
   }
 
 }
