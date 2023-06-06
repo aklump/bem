@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class BemTest extends TestCase {
 
+  use \AKlump\Bem\Tests\TestTraits\AssertTrait;
+
   public function testSetGlobalBlockAffectsAllInstances() {
     $bem1 = new Bem('peanut');
     $this->assertSameClassStringAnyOrder('peanut bem', $bem1->bemBlock(BemInterface::GLOBAL));
@@ -93,13 +95,5 @@ final class BemTest extends TestCase {
     $this->assertSameClassStringAnyOrder('fish js-fish bem js-bem', $bem->bemBlock(BemInterface::GLOBAL | BemInterface::JS));
   }
 
-  private function assertSameClassStringAnyOrder(string $expected_classes, $result) {
-    $expected_classes = explode(' ', $expected_classes);
-    $actual_classes = explode(' ', $result);
-    $this->assertCount(count($expected_classes), $actual_classes);
-    foreach ($expected_classes as $expected_class) {
-      $this->assertContains($expected_class, $actual_classes);
-    }
-  }
 
 }
