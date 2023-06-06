@@ -155,7 +155,7 @@ final class BemLegacy {
    * BemInterface::JS) instead.
    */
   public function bemElementWithGlobal(string $element, int $options = 0): string {
-    $global = new Bem('bem');
+    $global = new Bem(BemInterface::GLOBAL_BLOCK);
 
     return implode(' ', [
       $this->bemElement($element, $options),

@@ -90,6 +90,32 @@ $copy->bemElement('content', \AKlump\Bem\BemInterface::GLOBAL); // "copy__conten
 
 To alter the way the classes are formatted, create a new, custom class implementing `\AKlump\Bem\Styles\StyleInterface` for control of the processing and output of the classes, including the division characters. Look to `\AKlump\Bem\Styles\Official` for a model.
 
+## Usage With Twig
+
+```html
+{{ bem_set_global_block('component') }}
+{{ bem_set_block('story-section') }}
+<section>
+  <div class="{{ bem_block().and().js().and().modifier('th-summary').and().modifier('lang-en') }}">
+      <div class="{{ bem_element('width').and().global() }}">
+      <div class="{{ bem_element('item').and().modifier('first') }}"></div>
+      <div class="{{ bem_element('item') }}"></div>
+      <div class="{{ bem_element('item').and().modifier('last') }}"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="story-section js-story-section story-section--th-summary story-section--lang-en">
+    <div class="story-section__width bem__width">
+      <div class="story-section__item story-section__item--first"></div>
+      <div class="story-section__item"></div>
+      <div class="story-section__item story-section__item--last"></div>
+    </div>
+  </div>
+</section>
+```
+
 ## Contributing
 
 If you find this project useful... please consider [making a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4E5KZHDQCEUV8&item_name=Gratitude%20for%20aklump%2Fbem).
