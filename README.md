@@ -99,8 +99,8 @@ $bem = new \AKlump\Bem\FluentBem('foo');
 (string) $bem->block()->and()->js(); // "foo js-foo"
 (string) $bem->element('content')->and()->js(); // "foo__content js-foo__content"
 
-(string) $bem->block()->js(); // "foo js-foo"
-(string) $bem->element('content')->js(); // "foo__content js-foo__content"
+(string) $bem->block()->js(); // "js-foo"
+(string) $bem->element('content')->js(); // "js-foo__content"
 
 (string) $bem->element('content')->and()->modifier('has-image'); // "foo__content foo__content--has-image"
 (string) $bem->element('content')->modifier('has-image'); // "foo__content--has-image"
