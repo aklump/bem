@@ -1,16 +1,16 @@
 <?php
 
 
-namespace AKlump\Bem\Tests;
+namespace AKlump\Bem\Tests\Legacy;
 
-use AKlump\Bem\Bem;
-use AKlump\Bem\BemInterface;
+use AKlump\Bem\Legacy\Bem;
+use AKlump\Bem\Legacy\BemInterface;
+use AKlump\Bem\Legacy\BemLegacy;
 use PHPUnit\Framework\TestCase;
-use AKlump\Bem\BemLegacy;
 
 /**
  * @group extensions
- * @covers \AKlump\Bem\Bem
+ * @covers \AKlump\Bem\Legacy\Bem
  */
 final class BemLegacyTest extends TestCase {
 

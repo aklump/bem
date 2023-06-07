@@ -1,6 +1,6 @@
 <?php
 
-namespace AKlump\Bem;
+namespace AKlump\Bem\Legacy;
 
 use AKlump\Bem\Styles\Legacy;
 

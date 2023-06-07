@@ -1,14 +1,14 @@
 <?php
 
-namespace AKlump\Bem\Tests;
+namespace AKlump\Bem\Tests\Legacy;
 
-use AKlump\Bem\Bem;
-use AKlump\Bem\BemInterface;
-use AKlump\Bem\Tests\TestTraits\AssertTrait;
+use AKlump\Bem\Legacy\Bem;
+use AKlump\Bem\Legacy\BemInterface;
+use AKlump\Bem\Tests\AssertTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AKlump\Bem\Bem
+ * @covers \AKlump\Bem\Legacy\Bem
  */
 final class BemTest extends TestCase {
 

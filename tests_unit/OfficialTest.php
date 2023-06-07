@@ -15,6 +15,7 @@ class OfficialTest extends TestCase {
    */
   public function commonDataProvider() {
     $tests = [];
+    $tests[] = ['apple', '   apple   '];
     $tests[] = ['-apple-', '___---apple_-_-_'];
     $tests[] = ['-apple-', '_apple_'];
     $tests[] = ['foo-bar', 'foo@#$(*&bar'];

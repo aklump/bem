@@ -1,9 +1,6 @@
 <?php
 
-namespace AKlump\Bem;
-
-use AKlump\Bem\styles\StyleInterface;
-use AKlump\Bem\Styles\Official;
+namespace AKlump\Bem\Legacy;
 
 /**
  * Provides BEM methods using the official style.

@@ -59,7 +59,7 @@ final class Official implements StyleInterface {
    * @link https://getbem.com/naming/
    */
   private function normalize(string $name_part) {
-    $name_part = strtolower($name_part);
+    $name_part = strtolower(trim($name_part));
 
     // May consist of Latin letters, digits, and single dashes.
     $name_part = preg_replace('/[^a-z0-9-]/', '-', $name_part);
