@@ -21,8 +21,9 @@ final class Bem implements BemInterface {
    * @param string $block
    *   The base to use for the BEM block.
    */
-  public function __construct(string $block) {
+  public function __construct(string $block, string $global_block = BemInterface::GLOBAL_BLOCK) {
     $this->bemSetBlock($block);
+    $this->bemGlobalSetBlock($global_block);
   }
 
 }

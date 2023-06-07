@@ -1,0 +1,18 @@
+{{ bem_set_global_block('component') }}
+{{ bem_set_block('story-section') }}
+<body>
+<h1>Twig Extension Example</h1>
+
+<pre>
+&lt;section>
+  &ltdiv class="{{ bem_block().and().js().and().modifier
+    ('th-summary').and().modifier('lang-en') }}">
+    &lt;div class="{{ bem_element('width').and().global() }}">
+      &lt;div class="{{ bem_element('item').and().modifier('first') }}">&lt;/div>
+      &lt;div class="{{ bem_element('item') }}">&lt;/div>
+      &lt;div class="{{ bem_element('item').and().modifier('last') }}">&lt;/div>
+    &lt;/div>
+  &lt;/div>
+&lt;/section>
+</pre>
+</body>
