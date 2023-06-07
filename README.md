@@ -86,9 +86,55 @@ $copy->bemElement('content', \AKlump\Bem\BemInterface::GLOBAL); // "copy__conten
 
 **The default global block is `bem`, however you can override that by using `Bem::bemGlobalSetBlock('foo')`.**
 
+## Fluent Interface
+
+The examples above have been rewritten using the `\AKlump\Bem\FluentBem` class, which is also included in this package.
+
+```php
+$bem = new \AKlump\Bem\FluentBem('foo');
+(string) $bem->block(); // "foo"
+(string) $bem->element('content'); // "foo__content"
+(string) $bem->block()->modifier('has-image'); // "foo--has-image"
+
+(string) $bem->block()->and()->js(); // "foo js-foo"
+(string) $bem->element('content')->and()->js(); // "foo__content js-foo__content"
+
+(string) $bem->block()->js(); // "foo js-foo"
+(string) $bem->element('content')->js(); // "foo__content js-foo__content"
+
+(string) $bem->element('content')->and()->modifier('has-image'); // "foo__content foo__content--has-image"
+(string) $bem->element('content')->modifier('has-image'); // "foo__content--has-image"
+```
+
 ## Customizing Output Style
 
 To alter the way the classes are formatted, create a new, custom class implementing `\AKlump\Bem\Styles\StyleInterface` for control of the processing and output of the classes, including the division characters. Look to `\AKlump\Bem\Styles\Official` for a model.
+
+## Usage With Twig
+
+```html
+{{ bem_set_global_block('component') }}
+{{ bem_set_block('story-section') }}
+<section>
+  <div class="{{ bem_block().and().js().and().modifier('th-summary').and().modifier('lang-en') }}">
+      <div class="{{ bem_element('width').and().global() }}">
+      <div class="{{ bem_element('item').and().modifier('first') }}"></div>
+      <div class="{{ bem_element('item') }}"></div>
+      <div class="{{ bem_element('item').and().modifier('last') }}"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="story-section js-story-section story-section--th-summary story-section--lang-en">
+    <div class="story-section__width bem__width">
+      <div class="story-section__item story-section__item--first"></div>
+      <div class="story-section__item"></div>
+      <div class="story-section__item story-section__item--last"></div>
+    </div>
+  </div>
+</section>
+```
 
 ## Contributing
 

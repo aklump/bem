@@ -4,6 +4,7 @@ namespace AKlump\Bem\Tests;
 
 use AKlump\Bem\Bem;
 use AKlump\Bem\BemInterface;
+use AKlump\Bem\Tests\TestTraits\AssertTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -11,19 +12,20 @@ use PHPUnit\Framework\TestCase;
  */
 final class BemTest extends TestCase {
 
-  use \AKlump\Bem\Tests\TestTraits\AssertTrait;
+  use AssertTrait;
 
-  public function testSetGlobalBlockAffectsAllInstances() {
-    $bem1 = new Bem('peanut');
-    $this->assertSameClassStringAnyOrder('peanut bem', $bem1->bemBlock(BemInterface::GLOBAL));
+  public function testBemGlobalSetBlockIsPerInstanceOnly() {
+    $bem = new Bem('foo');
+    $bem->bemGlobalSetBlock('element');
+    $this->assertSameClassStringAnyOrder('foo element', $bem->bemBlock(BemInterface::GLOBAL));
+    $bem = new Bem('foo');
+    $this->assertSameClassStringAnyOrder('foo bem', $bem->bemBlock(BemInterface::GLOBAL));
+  }
 
-    Bem::bemGlobalSetBlock('butter');
-    $bem2 = new Bem('peanut');
-    $this->assertSameClassStringAnyOrder('peanut butter', $bem1->bemBlock(BemInterface::GLOBAL));
-    $this->assertSameClassStringAnyOrder('peanut butter', $bem2->bemBlock(BemInterface::GLOBAL));
-
-    // Reset back to the default for other tests.
-    Bem::bemGlobalSetBlock();
+  public function testBemGlobalSetBlockAffectsClasses() {
+    $bem = new Bem('foo');
+    $bem->bemGlobalSetBlock('element');
+    $this->assertSameClassStringAnyOrder('foo element', $bem->bemBlock(BemInterface::GLOBAL));
   }
 
   public function testElementWithModifierAndGlobalAndJsOptions() {
@@ -62,12 +64,25 @@ final class BemTest extends TestCase {
     $this->assertSameClassStringAnyOrder('bem', $bem->bemGlobal()->bemBlock());
   }
 
+  public function testBemModifierWithNoBaseOptionThrows() {
+    $this->expectException(\InvalidArgumentException::class);
+    $bem = new Bem('foo');
+    $bem->bemModifier('bar', BemInterface::NO_BASE);
+  }
+
   public function testBemModifier() {
     $bem = new Bem('sandwich');
     $this->assertSameClassStringAnyOrder('sandwich--meet', $bem->bemModifier('meet'));
     $this->assertSameClassStringAnyOrder('sandwich--meet js-sandwich--meet', $bem->bemModifier('meet', BemInterface::JS));
     $this->assertSameClassStringAnyOrder('sandwich--meet bem--meet', $bem->bemModifier('meet', BemInterface::GLOBAL));
     $this->assertSameClassStringAnyOrder('sandwich--meet js-sandwich--meet bem--meet js-bem--meet', $bem->bemModifier('meet', BemInterface::GLOBAL | BemInterface::JS));
+    $this->assertSameClassStringAnyOrder('sandwich--meet js-sandwich--meet bem--meet js-bem--meet', $bem->bemModifier('meet', BemInterface::GLOBAL | BemInterface::JS));
+  }
+
+  public function testBemElementWithNoBaseOptionThrows() {
+    $this->expectException(\InvalidArgumentException::class);
+    $bem = new Bem('foo');
+    $bem->bemElement('bar', BemInterface::NO_BASE);
   }
 
   public function testBemElement() {
@@ -76,6 +91,12 @@ final class BemTest extends TestCase {
     $this->assertSameClassStringAnyOrder('tree__trunk js-tree__trunk', $bem->bemElement('trunk', BemInterface::JS));
     $this->assertSameClassStringAnyOrder('tree__trunk bem__trunk', $bem->bemElement('trunk', BemInterface::GLOBAL));
     $this->assertSameClassStringAnyOrder('tree__trunk js-tree__trunk bem__trunk js-bem__trunk', $bem->bemElement('trunk', BemInterface::GLOBAL | BemInterface::JS));
+  }
+
+  public function testBemBlockWithNoBaseOptionThrows() {
+    $this->expectException(\InvalidArgumentException::class);
+    $bem = new Bem('foo');
+    $bem->bemBlock(BemInterface::NO_BASE);
   }
 
   public function testBemBlock() {

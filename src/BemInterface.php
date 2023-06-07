@@ -12,6 +12,12 @@ use AKlump\Bem\Styles\StyleInterface;
  */
 interface BemInterface {
 
+  const BLOCK = 1;
+
+  const ELEMENT = 2;
+
+  const GLOBAL_BLOCK = 'bem';
+
   /**
    * @var int with-javascript option.
    */
@@ -29,25 +35,14 @@ interface BemInterface {
   const NO_BASE = 4;
 
   /**
-   * Set the global block for all instances.
-   *
-   * Be careful with this, because it will affect ALL instances, those already
-   * created AND those yet to be created.  It's meant to be called once by your
-   * bootstrap and then left alone.
+   * Set the global block value.
    *
    * @param string $global_block
    *   The value to use for the global block.
-   *
-   * @code
-   * Bem::bemGlobalSetBlock('component');
-   * $bem = new Bem(...
-   * $bem2 = new Bem(...
-   * $bem3 = new Bem(...
-   * @endcode
    */
-  public static function bemGlobalSetBlock(string $global_block): void;
+  public function bemGlobalSetBlock(string $global_block): void;
 
-  public static function bemGlobal(): BemInterface;
+  public function bemGlobal(): BemInterface;
 
   public function bemSetBlock(string $block): void;
 
@@ -57,7 +52,7 @@ interface BemInterface {
    * Standalone entity that is meaningful on its own.
    *
    * @return string
-   *   Return the block value.
+   *   Return the block value, e.g. 'foo'.
    *
    * @throws \RuntimeException If the block has not been set correctly or is invalid.
    */
@@ -69,11 +64,11 @@ interface BemInterface {
    * A part of a block that has no standalone meaning and is semantically tied to its block.
    *
    * @param string $element
-   *   The element, less the block portion.
+   *   The element, less the block portion, e.g., 'bar'.
    * @param int $options
    *
    * @return string
-   *   The BE(lement)M based on component name.
+   *   The BE(lement)M based on component name, e.g. 'foo__bar'.
    */
   public function bemElement(string $element, int $options = 0): string;
 
@@ -83,11 +78,13 @@ interface BemInterface {
    * A flag on a block or element. Use them to change appearance or behavior.
    *
    * @param string $modifier
-   *   The modifier, less the block portion.
+   *   The modifier, less the block portion, e.g. 'baz'.
    * @param int $options
    *
    * @return string
-   *   The BEM(odifier) based on component name.
+   *   The BEM(odifier) based on component name, e.g. 'foo--baz'.
+   *
+   * @throws \InvalidArgumentException If an invalid option is used.
    */
   public function bemModifier(string $modifier, int $options = 0): string;
 
