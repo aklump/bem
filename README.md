@@ -64,7 +64,7 @@ $classes = $bem->block()->plusModifier('bar)->plusJs()
 
 ## "Global" Innovation
 
-You'll find an innovation in this project called "global". It can be used to target common parts across all blocks at once. Refer to the example below where `component` and `component__content` represent the _global block_ and _global element_, respectively. This innovation, in this case, allows you to target all three components' `content` in a single line of CSS. It can be thought of as a means of grouping. Use the the `plusGlobal()` method for this feature.
+You'll find an innovation in this project called _global_. It can be used to target common parts across all blocks at once. Refer to the example below where `component` and `component__content` represent the _global block_ and _global element_, respectively. This innovation, in this case, allows you to target all three components' `content` in a single line of CSS. It can be thought of as a means of grouping. Use the the `plusGlobal()` method for this feature.
 
 ```html
 <section>
@@ -97,11 +97,37 @@ $film->element('content')->plusGlobal(); // "film__content component__content"
 $copy->element('content')->plusGlobal(); // "copy__content component__content"
 ```
 
+### Casting to Array
+
+Given a complex chain as shown next, you can see the helpfulness of the `plus*` methods and why you might want to use the `toArray()` method.
+
+```php
+$bem = new \AKlump\Bem\Fluent\Bem('foo', 'components');
+$classes = $bem->element('content')
+  ->plusModifier('first')
+  ->plusGlobal()
+  ->plusJs()
+  ->toArray();
+
+$classes === [
+  'foo__content',
+  'foo__content--first',
+  'components__content',
+  'components__content--first',
+  'js-foo__content',
+  'js-foo__content--first',
+  'js-components__content',
+  'js-components__content--first',
+];
+```
+
 ## Customizing Output Style
 
 To alter the way the classes are formatted, create a new, custom class implementing `\AKlump\Bem\Styles\StyleInterface` for control of the processing and output of the classes, including the division characters. Look to `\AKlump\Bem\Styles\Official` for a model. Pass your custom style to `\AKlump\Bem\Fluent\Bem` when constructing.
 
 ## Usage With Twig
+
+### Themers
 
 ```html
 {{ bem_set_global('component') }}
@@ -138,6 +164,10 @@ To alter the way the classes are formatted, create a new, custom class implement
 </section>
 ```
 
+### Developers
+
+See `\AKlump\Bem\Twig\BemExtension`
+
 ## Contributing
 
 If you find this project useful... please consider [making a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4E5KZHDQCEUV8&item_name=Gratitude%20for%20aklump%2Fbem).
@@ -146,7 +176,3 @@ If you find this project useful... please consider [making a donation](https://w
 
 * https://packagist.org/packages/widoz/bem
 * https://packagist.org/packages/pixo/bem
-
-## Usage as a Class Trait
-
-If you want to add the `bem*` methods to an existing class, you should use `\AKlump\Bem\Fluent\BemTrait`. The `\AKlump\Bem\Fluent\BemInterface` uses a `bem` prefix for all methods to allow clean integration with existing classes, to make them "BEM enabled".
