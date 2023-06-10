@@ -112,12 +112,12 @@ $classes = $bem->element('content')
 $classes === [
   'foo__content',
   'foo__content--first',
-  'components__content',
-  'components__content--first',
   'js-foo__content',
   'js-foo__content--first',
   'js-components__content',
   'js-components__content--first',
+  'components__content',
+  'components__content--first',
 ];
 ```
 

@@ -8,6 +8,17 @@ use AKlump\Bem\Fluent\Interfaces\PurposeInterface;
 
 trait OutputTrait {
 
+  /**
+   * Return all classes representing the state.
+   *
+   * The order of the classes will alphabetical, however they are first grouped
+   * in this order and then alphabetized within the group: *, js-*, global*.
+   *
+   * @return array
+   *   The array of classes based on the state.
+   *
+   * @see \AKlump\Bem\Fluent\OutputTrait::sort
+   */
   public function toArray(): array {
     $state = $this->state->all();
     $style = $this->state->getStyle();
