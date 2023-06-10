@@ -140,4 +140,9 @@ To alter the way the classes are formatted, create a new, custom class implement
 
 If you find this project useful... please consider [making a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4E5KZHDQCEUV8&item_name=Gratitude%20for%20aklump%2Fbem).
 
+## Similar Packages
+
+* https://packagist.org/packages/widoz/bem
+* https://packagist.org/packages/pixo/bem
+
 

@@ -35,10 +35,6 @@ interface StyleInterface {
   /**
    * @return string
    *   The classname prefix to indicate a JS class.
-   *
-   * @see \AKlump\Bem\BemInterface::bemJsBlock
-   * @see \AKlump\Bem\BemInterface::bemJsElement
-   * @see \AKlump\Bem\BemInterface::bemJsModifier
    */
   public function javascript(): string;
 

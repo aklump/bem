@@ -1,6 +1,6 @@
 <?php
 
-namespace AKlump\Bem\Tests\TestTraits;
+namespace AKlump\Bem\Tests;
 
 
 trait AssertTrait {

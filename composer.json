@@ -1,6 +1,6 @@
 {
   "name": "aklump/bem",
-  "description": "A PHP project to enforce the Block Element Modifier (CSS) model.",
+  "description": "A PHP project to enforce the Block Element Modifier (CSS) methodology.",
   "homepage": "https://github.com/aklump/bem",
   "version": "0.0.0",
   "authors": [
@@ -20,6 +20,7 @@
     "php": ">=7.3"
   },
   "require-dev": {
+    "ext-curl": "*",
     "phpunit/phpunit": "^9.5",
     "twig/twig": "^2"
   }
