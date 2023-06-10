@@ -8,7 +8,7 @@ use AKlump\Bem\HasStateTrait;
 use AKlump\Bem\State;
 use AKlump\Bem\Styles\StyleInterface;
 
-final class Bem implements BaseInterface {
+class Bem implements BaseInterface {
 
   use HasStateTrait;
 

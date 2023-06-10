@@ -4,130 +4,132 @@ BEM — is a methodology that helps you to create reusable components and code s
 
 <https://getbem.com/>
 
-## Stand-alone Usage
+## Usage
 
 Create a class instance to represent your BEM model. Pass the "block" as the constructor argument.
 
 ```php
-$bem = new \AKlump\Bem\Bem('foo');
+$bem = new \AKlump\Bem\Fluent\Bem('foo');
 ```
 
-### BEM Classes
+All methods return an object instance that can be typecast to a string. Or, you can also call `toString()` or `toArray()` as appropriate; see `\AKlump\Bem\Fluent\Interfaces\OutputInterface` for details. All of the following produce the same output.
+
+```
+(string) $bem->block(); // foo
+strval($bem->block()); // foo
+$bem->block()->toString(); // foo
+```
+
+For simplicity any remaining examples will show only the first form.
+
+### The Basic Four
 
 ```php
-$bem->bemBlock(); // "foo"
-$bem->bemElement('content'); // "foo__content"
-$bem->bemModifier('has-image'); // "foo--has-image"
+(string) $bem->block(); // "foo"
+(string) $bem->element('content'); // "foo__content"
+(string) $bem->block()->modifier('has-image'); // "foo--has-image"
+(string) $bem->element()->modifier('content', 'has-image'); // "foo__content--has-image"
 ```
 
-### + Javascript Classes
-
-Use the `\AKlump\Bem\BemInterface::JS` option to any method to include `js-` classes. E.g.,
+### For Javascript Purposes
 
 ```php
-$bem->bemBlock(\AKlump\Bem\BemInterface::JS); // "foo js-foo"
-$bem->bemElement('content', \AKlump\Bem\BemInterface::JS); // "foo__content js-foo__content"
+(string) $bem->block()->js(); // "js-foo"
+(string) $bem->element('content')->js(); // "js-foo__content"
 ```
 
-See `\AKlump\Bem\BemInterface` for all available options.
+### Convenience Syntax
 
-### Only Javascript Classes
+There are some conveniences you should take note of; pay special attention to the `plus*` methods.
 
 ```php
-$bem->bemBlock(\AKlump\Bem\BemInterface::JS | \AKlump\Bem\BemInterface::NO_BASE); // "js-foo"
-$bem->bemElement('content', \AKlump\Bem\BemInterface::JS | \AKlump\Bem\BemInterface::NO_BASE); // "js-foo__content"
+// In both cases "foo js-foo" === $classes.
+$classes = $bem->block() . ' ' . $bem->block()-js();
+$classes = $bem->block()->plusJs();
+
+// In both cases "foo foo--bar" === $classes.
+$classes = $bem->block() . ' ' . $bem->block()->modifier('bar);
+$classes = $bem->block()->plusModifier('bar);
+
+// In both cases "foo foo--bar js-foo js-foo--bar" === $classes.
+$classes = implode(' ', [
+  $bem->block(),
+  $bem->block()->modifier('bar),
+  $bem->block()->js(),
+  $bem->block()->modifier('bar)->js(),
+]);
+  
+$classes = $bem->block()->plusModifier('bar)->plusJs()
 ```
-
-### Modified Elements
-
-```php
-$bem->bemElementWithModifier('content', 'has-image'); // "foo__content foo__content--has-image"
-$bem->bemElementWithModifier('content', 'has-image', \AKlump\Bem\BemInterface::NO_BASE); // "foo__content--has-image"
-```
-
-## Usage as a Class Trait
-
-If you want to add the `bem*` methods to an existing class, you should use `\AKlump\Bem\BemTrait`. The `\AKlump\Bem\BemInterface` uses a `bem` prefix for all methods to allow clean integration with existing classes, to make them "BEM enabled".
 
 ## "Global" Innovation
 
-This project provides a singular, global BEM instance that can be used to target common _elements_ for all blocks, at once. Refer to the example below. The `bem` and `bem__content` represent the _global block_ and _global element_, respectively. This innovation, in this case, allows you to target all three components' `content` in a single line of CSS. It can be thought of as a means of grouping.
+You'll find an innovation in this project called "global". It can be used to target common parts across all blocks at once. Refer to the example below where `component` and `component__content` represent the _global block_ and _global element_, respectively. This innovation, in this case, allows you to target all three components' `content` in a single line of CSS. It can be thought of as a means of grouping. Use the the `plusGlobal()` method for this feature.
 
 ```html
 <section>
-  <div class="story bem">
-    <div class="story__content bem__content"></div>
+  <div class="story component">
+    <div class="story__content component__content"></div>
   </div>
-  <div class="film bem">
-    <div class="film__content bem__content"></div>
+  <div class="film component">
+    <div class="film__content component__content"></div>
   </div>
-  <div class="copy bem">
-    <div class="copy__content bem__content"></div>
+  <div class="copy component">
+    <div class="copy__content component__content"></div>
   </div>
 </section>
 ```
 
 ```css
-.bem__content {
+.component__content {
   width: 900px;
   margin: auto;
 }
 ```
 
 ```php
-$story = new \AKlump\Bem\Bem('story');
-$film = new \AKlump\Bem\Bem('film');
-$copy = new \AKlump\Bem\Bem('copy');
+$story = new \AKlump\Bem\Fluent\Bem('story', 'component');
+$film = new \AKlump\Bem\Fluent\Bem('film', 'component');
+$copy = new \AKlump\Bem\Fluent\Bem('copy', 'component');
 
-$story->bemElement('content', \AKlump\Bem\BemInterface::GLOBAL); // "story__content bem__content"
-$film->bemElement('content', \AKlump\Bem\BemInterface::GLOBAL); // "film__content bem__content"
-$copy->bemElement('content', \AKlump\Bem\BemInterface::GLOBAL); // "copy__content bem__content"
-```
-
-**The default global block is `bem`, however you can override that by using `Bem::bemGlobalSetBlock('foo')`.**
-
-## Fluent Interface
-
-The examples above have been rewritten using the `\AKlump\Bem\FluentBem` class, which is also included in this package.
-
-```php
-$bem = new \AKlump\Bem\FluentBem('foo');
-(string) $bem->block(); // "foo"
-(string) $bem->element('content'); // "foo__content"
-(string) $bem->block()->modifier('has-image'); // "foo--has-image"
-
-(string) $bem->block()->and()->js(); // "foo js-foo"
-(string) $bem->element('content')->and()->js(); // "foo__content js-foo__content"
-
-(string) $bem->block()->js(); // "js-foo"
-(string) $bem->element('content')->js(); // "js-foo__content"
-
-(string) $bem->element('content')->and()->modifier('has-image'); // "foo__content foo__content--has-image"
-(string) $bem->element('content')->modifier('has-image'); // "foo__content--has-image"
+$story->element('content')->plusGlobal(); // "story__content component__content"
+$film->element('content')->plusGlobal(); // "film__content component__content"
+$copy->element('content')->plusGlobal(); // "copy__content component__content"
 ```
 
 ## Customizing Output Style
 
-To alter the way the classes are formatted, create a new, custom class implementing `\AKlump\Bem\Styles\StyleInterface` for control of the processing and output of the classes, including the division characters. Look to `\AKlump\Bem\Styles\Official` for a model.
+To alter the way the classes are formatted, create a new, custom class implementing `\AKlump\Bem\Styles\StyleInterface` for control of the processing and output of the classes, including the division characters. Look to `\AKlump\Bem\Styles\Official` for a model. Pass your custom style to `\AKlump\Bem\Fluent\Bem` when constructing.
 
 ## Usage With Twig
 
 ```html
-{{ bem_set_global_block('component') }}
+{{ bem_set_global('component') }}
 {{ bem_set_block('story-section') }}
-<section>
-  <div class="{{ bem_block().and().js().and().modifier('th-summary').and().modifier('lang-en') }}">
-      <div class="{{ bem_element('width').and().global() }}">
-      <div class="{{ bem_element('item').and().modifier('first') }}"></div>
-      <div class="{{ bem_element('item') }}"></div>
-      <div class="{{ bem_element('item').and().modifier('last') }}"></div>
-    </div>
-  </div>
-</section>
+<body>
+<h1>Twig Extension Example</h1>
+
+<pre>
+{% set classes = [
+  bem_block().plus_js(),
+  bem_block().modifier('th-summary'),
+  bem_block().modifier('lang-en'),
+] %}
+&lt;section>
+  &ltdiv class="{{ classes|join(' ') }}">
+    &lt;div class="{{ bem_element('width').plus_global() }}">
+      &lt;div class="{{ bem_element('item').plus_modifier('first') }}">&lt;/div>
+      &lt;div class="{{ bem_element('item') }}">&lt;/div>
+      &lt;div class="{{ bem_element('item').plus_modifier('last') }}">&lt;/div>
+    &lt;/div>
+  &lt;/div>
+&lt;/section>
+</pre>
+</body>
 
 <section>
   <div class="story-section js-story-section story-section--th-summary story-section--lang-en">
-    <div class="story-section__width bem__width">
+    <div class="story-section__width component__width">
       <div class="story-section__item story-section__item--first"></div>
       <div class="story-section__item"></div>
       <div class="story-section__item story-section__item--last"></div>
@@ -145,4 +147,6 @@ If you find this project useful... please consider [making a donation](https://w
 * https://packagist.org/packages/widoz/bem
 * https://packagist.org/packages/pixo/bem
 
+## Usage as a Class Trait
 
+If you want to add the `bem*` methods to an existing class, you should use `\AKlump\Bem\Fluent\BemTrait`. The `\AKlump\Bem\Fluent\BemInterface` uses a `bem` prefix for all methods to allow clean integration with existing classes, to make them "BEM enabled".
