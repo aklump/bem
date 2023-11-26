@@ -2,7 +2,6 @@
   "name": "aklump/bem",
   "description": "A PHP project to enforce the Block Element Modifier (CSS) methodology.",
   "homepage": "https://github.com/aklump/bem",
-  "version": "0.0.0",
   "authors": [
     {
       "name": "Aaron Klump",
@@ -22,6 +21,7 @@
   "require-dev": {
     "ext-curl": "*",
     "phpunit/phpunit": "^9.5",
-    "twig/twig": "^2"
+    "twig/twig": "^2",
+    "aklump/phpswap": "^0.0.7"
   }
 }
