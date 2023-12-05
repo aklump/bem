@@ -23,5 +23,6 @@
     "phpunit/phpunit": "^9.5",
     "twig/twig": "^2",
     "aklump/phpswap": "^0.0.7"
-  }
+  },
+  "license": "BSD-3-Clause"
 }
