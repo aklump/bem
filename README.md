@@ -38,6 +38,23 @@ For simplicity any remaining examples will show only the first form.
 (string) $bem->element('content')->js(); // "js-foo__content"
 ```
 
+### String Cast Gotcha
+
+If you lean on the automatic string casting you may get into trouble in the following situation. In the incorrect code, you end up with `lorem__content` for both classes; the correct way to handle this situation is to explicitly cast to string.
+
+```php
+<?php
+
+// Wrong
+$bem = new \AKlump\Bem\Fluent\Bem('lorem');
+$foo = sprintf('<div class="%s"><span class="%s">', $bem->element('number'), $bem->element('content'));
+
+// Correct
+$bem = new \AKlump\Bem\Fluent\Bem('lorem');
+$foo = sprintf('<div class="%s"><span class="%s">', $bem->element('number')->toString(), (string) $bem->element('content'));
+
+```
+
 ### Convenience Syntax
 
 There are some conveniences you should take note of; pay special attention to the `plus*` methods.
@@ -67,6 +84,7 @@ $classes = $bem->block()->plusModifier('bar)->plusJs()
 You'll find an innovation in this project called _global_. It can be used to target common parts across all blocks at once. Refer to the example below where `component` and `component__content` represent the _global block_ and _global element_, respectively. This innovation, in this case, allows you to target all three components' `content` in a single line of CSS. It can be thought of as a means of grouping. Use the the `plusGlobal()` method for this feature.
 
 ```html
+
 <section>
   <div class="story component">
     <div class="story__content component__content"></div>
@@ -82,8 +100,8 @@ You'll find an innovation in this project called _global_. It can be used to tar
 
 ```css
 .component__content {
-  width: 900px;
-  margin: auto;
+    width: 900px;
+    margin: auto;
 }
 ```
 
