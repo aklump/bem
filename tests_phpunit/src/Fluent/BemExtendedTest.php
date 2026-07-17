@@ -4,8 +4,6 @@ namespace AKlump\Bem\Tests\Fluent;
 
 use AKlump\Bem\Fluent\Bem;
 use AKlump\Bem\Fluent\Interfaces\MiddleInterface;
-use AKlump\Bem\Fluent\Interfaces\OutputInterface;
-use AKlump\Bem\Fluent\Interfaces\PurposeInterface;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -12,7 +12,7 @@
   "autoload": {
     "psr-4": {
       "AKlump\\Bem\\": "src/",
-      "AKlump\\Bem\\Tests\\": "tests_unit/"
+      "AKlump\\Bem\\Tests\\": "tests_phpunit/src/"
     }
   },
   "require": {
@@ -21,8 +21,8 @@
   "require-dev": {
     "ext-curl": "*",
     "phpunit/phpunit": "^9.5",
-    "twig/twig": "^2",
-    "aklump/phpswap": "^0.0.7"
+    "twig/twig": "^2.0 || ^3.4 || ^4.4",
+    "aklump/phpswap": "^0.0"
   },
   "license": "BSD-3-Clause"
 }

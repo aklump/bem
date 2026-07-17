@@ -12,7 +12,7 @@ class Bem implements BaseInterface {
 
   use HasStateTrait;
 
-  public function __construct(string $block, string $global = NULL, StyleInterface $style = NULL) {
+  public function __construct(string $block, ?string $global = NULL, ?StyleInterface $style = NULL) {
     $this->setState(new State());
     $this->state
       ->set('block', $block)

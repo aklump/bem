@@ -1,6 +1,6 @@
 <?php
 
-namespace AKlump\Bem\Tests;
+namespace AKlump\Bem\Tests\Twig;
 
 use PHPUnit\Framework\TestCase;
 
@@ -26,7 +26,15 @@ final class BemExtensionTest extends TestCase {
     $webpage = curl_init('http://127.0.0.1:8080/');
     curl_setopt($webpage, CURLOPT_RETURNTRANSFER, TRUE);
     $html = curl_exec($webpage);
+    $status = curl_getinfo($webpage, CURLINFO_HTTP_CODE);
+    if ($status !== 200) {
+      throw new \RuntimeException(sprintf('HTTP status code %d. Use bin/start_test_server.sh or troubleshoot the test server files.', $status));
+    }
+    $error = curl_error($webpage);
     curl_close($webpage);
+    if ($error) {
+      throw new \RuntimeException('Curl error: ' . $error);
+    }
 
     return FALSE === $html ? NULL : $html;
   }
