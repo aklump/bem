@@ -36,6 +36,7 @@ function run_tests() {
   start_server "$version"
   ./vendor/bin/phpswap use "$version" $verbose './vendor/bin/phpunit -c tests_phpunit'
   stop_server
+  echo
 }
 
 run_tests 7.3
